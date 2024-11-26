@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProjectGrid } from '@/components/dashboard/ProjectGrid';
 import { UploadZone } from '@/components/upload/UploadZone';
+import { NewProjectModal } from '@/components/projects/NewProjectModal';
 import { type Project } from '@/types';
 
 // Mock data for demonstration
@@ -62,7 +63,8 @@ const mockProjects: Project[] = [
 ];
 
 function App() {
-  const [projects] = useState<Project[]>(mockProjects);
+  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
 
   const handleFileSelect = async (files: FileList) => {
     // TODO: Implement file processing logic
@@ -72,6 +74,27 @@ function App() {
   const handleViewDetails = (id: string) => {
     // TODO: Implement project details view
     console.log('Viewing project:', id);
+  };
+
+  const handleCreateProject = (data: {
+    name: string;
+    department: string;
+    year: string;
+    totalBudget: string;
+  }) => {
+    const newProject: Project = {
+      id: crypto.randomUUID(),
+      name: data.name,
+      department: data.department,
+      year: parseInt(data.year),
+      totalBudget: parseInt(data.totalBudget),
+      usedBudget: 0,
+      status: 'active',
+      categories: [],
+      lastUpdated: new Date().toISOString(),
+    };
+
+    setProjects((prev) => [...prev, newProject]);
   };
 
   return (
@@ -84,7 +107,7 @@ function App() {
               Manage and track your project budgets
             </p>
           </div>
-          <Button>
+          <Button onClick={() => setIsNewProjectModalOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             New Project
           </Button>
@@ -104,6 +127,12 @@ function App() {
             />
           </div>
         </div>
+
+        <NewProjectModal
+          open={isNewProjectModalOpen}
+          onOpenChange={setIsNewProjectModalOpen}
+          onSubmit={handleCreateProject}
+        />
       </div>
     </div>
   );
